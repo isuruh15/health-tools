@@ -169,6 +169,7 @@ public class FhirSubCmd implements BLauncherCmd {
         if (this.engageSubCommand(argList)) {
             if (CMD_MODE_TEMPLATE.equals(mode)) {
                 printStream.println(HealthCmdConstants.PrintStrings.TEMPLATE_GEN_SUCCESS + targetOutputPath);
+                changeWorkingDir(targetOutputPath);
             } else {
                 printStream.println(HealthCmdConstants.PrintStrings.PKG_GEN_SUCCESS + targetOutputPath);
             }
@@ -242,6 +243,58 @@ public class FhirSubCmd implements BLauncherCmd {
             }
         } else {
             targetOutputPath = Paths.get(targetOutputPath + File.separator + "generated-" + mode);
+        }
+    }
+
+    private void changeWorkingDir(Path targetDir) {
+        String currentDirectory = System.getProperty("user.dir");
+        System.out.println("Current Directory: " + currentDirectory);
+
+        // Change the working directory
+        File directory = new File(String.valueOf(targetDir) + File.separator + "location");
+        if (directory.exists() && directory.isDirectory()) {
+            System.setProperty("user.dir", directory.getAbsolutePath());
+            System.out.println("Changed Directory to: " + System.getProperty("user.dir"));
+
+            // Execute your command or perform operations in the new directory
+            try {
+//                Process process = Runtime.getRuntime().exec("pwd");
+//                // Read the output of the command
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    System.out.println(line);
+//                }
+//
+//                // Wait for the command to complete
+//                int exitCode = process.waitFor();
+//                if (exitCode != 0) {
+//                    throw new RuntimeException("Command execution failed with exit code: " + exitCode);
+//                }
+                // Use ProcessBuilder to execute 'pwd'
+                ProcessBuilder processBuilder = new ProcessBuilder("bal format");
+                processBuilder.directory(directory);
+                processBuilder.wait(2000);
+                // Start the process
+                Process process = processBuilder.start();
+
+                // Read the output of the command
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+
+                // Wait for the command to complete
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    throw new RuntimeException("Command execution failed with exit code: " + exitCode);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            System.err.println("Invalid directory path.");
         }
     }
 
