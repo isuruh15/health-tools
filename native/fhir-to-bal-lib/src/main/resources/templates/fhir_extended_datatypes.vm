@@ -39,7 +39,7 @@ import $import;
             isArray: ${elementMapEntry.value.isArray()},
             description: "${elementMapEntry.value.description}",
             path: "${elementMapEntry.value.path}"
-        }#if($velocityCount != $mapEntry.value.annotation.elements.entrySet().size()),#end
+        }#if($foreach.count != $mapEntry.value.annotation.elements.entrySet().size()),#end
 #end
     #end
     },
@@ -68,7 +68,7 @@ public type ${mapEntry.value.name} record {|
 #if($elementMapEntry.value.getBalDataType().getType() == 'enum')
 public enum $elementMapEntry.value.typeName {
 #foreach ($childElementMapEntry in ${elementMapEntry.value.elements.entrySet()})
-    CODE_${elementMapEntry.value.typeName.toUpperCase()}_$util.resolveSpecialCharacters(${childElementMapEntry.key.toUpperCase()}).toUpperCase() = "$childElementMapEntry.key"#if($velocityCount != $elementMapEntry.value.elements.entrySet().size()),$util.getNewLine()#end
+    CODE_${elementMapEntry.value.typeName.toUpperCase()}_$util.resolveSpecialCharacters(${childElementMapEntry.key.toUpperCase()}).toUpperCase() = "$childElementMapEntry.key"#if($foreach.count != $elementMapEntry.value.elements.entrySet().size()),$util.getNewLine()#end
 #end
 $util.getNewLine()};
 
